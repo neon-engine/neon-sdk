@@ -7,7 +7,7 @@ ENV TZ=Etc/UTC
 ARG NINJA_RELEASE_URL=https://github.com/Kitware/ninja/releases/download
 ARG NINJA_VERSION=1.11.1.g95dee.kitware.jobserver-1
 ARG GCC_VERSION=13.3.0
-ARG LLVM_VERSION=17
+ARG LLVM_VERSION=llvmorg-20.1.4
 ARG CMAKE_VERSION=3.28.3
 ARG VULKAN_SDK_VERSION=1.4.313.0
 
@@ -58,6 +58,7 @@ RUN apt update && apt install -y \
     && wget -O ninja.tar.gz ${NINJA_RELEASE_URL}/v${NINJA_VERSION}/ninja-${NINJA_VERSION}_$(uname -m)-linux-gnu.tar.gz \
     && tar --strip-components=1 -xzf ninja.tar.gz \
     && mv ninja /opt/ninja \
+    && update-alternatives --install /usr/bin/ninja ninja /opt/ninja 100 \
     && rm -f ninja.tar.gz \
     # Build CMake from source
     && wget https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}.tar.gz \
@@ -89,11 +90,23 @@ RUN apt update && apt install -y \
     && update-alternatives --install /usr/bin/gcc gcc /opt/gcc-${GCC_VERSION}/bin/gcc 100 \
     && update-alternatives --install /usr/bin/g++ g++ /opt/gcc-${GCC_VERSION}/bin/g++ 100 \
     # LLVM/clang
-    && wget https://apt.llvm.org/llvm.sh \
-    && chmod +x llvm.sh \
-    && ./llvm.sh ${LLVM_VERSION} \
-    && update-alternatives --install /usr/bin/clang clang /usr/bin/clang-${LLVM_VERSION} 100 \
-    && update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-${LLVM_VERSION} 100 \
+    && git clone --depth 1 --branch ${LLVM_VERSION} https://github.com/llvm/llvm-project.git \
+    && cd llvm-project \
+    && mkdir build \
+    && cd build \
+    && cmake -G Ninja ../llvm-project/llvm \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX=/opt/llvm-${LLVM_VERSION} \
+        -DLLVM_ENABLE_PROJECTS="clang;lld;lldb" \
+        -DLLVM_ENABLE_RUNTIMES="compiler-rt;libcxx;libcxxabi" \
+        -DLLVM_TARGETS_TO_BUILD="X86;AArch64" \
+        -DLLVM_ENABLE_ASSERTIONS=ON \
+        -DLLDB_ENABLE_PYTHON=ON \
+        -DPYTHON_EXECUTABLE="$(which python3)" \
+    && cmake --build . --target install \
+    && cd .. \
+    # && update-alternatives --install /usr/bin/clang clang /usr/bin/clang-${LLVM_VERSION} 100 \
+    # && update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-${LLVM_VERSION} 100 \
     && apt clean
     # Vulkan SDK
 RUN mkdir -p /opt/vulkan \

@@ -59,6 +59,9 @@ RUN apt update && apt install -y \
         zlib1g-dev \
         libffi-dev \
         liblzma-dev \
+    && mkdir -p /src \
+    && cd /src \
+    # Install Ninja
     && wget -O ninja.tar.gz ${NINJA_RELEASE_URL}/v${NINJA_VERSION}/ninja-${NINJA_VERSION}_$(uname -m)-linux-gnu.tar.gz \
     && tar --strip-components=1 -xzf ninja.tar.gz \
     && mv ninja /opt/ninja \
@@ -71,15 +74,15 @@ RUN apt update && apt install -y \
     && ./bootstrap --prefix=/opt/cmake-${CMAKE_VERSION} --parallel=$(nproc) \
     && make -j$(nproc) \
     && make install \
-    && cd .. \
-    && update-alternatives --install /usr/bin/cmake cmake /opt/cmake-${CMAKE_VERSION} 100 \
+    && cd /src \
+    && update-alternatives --install /usr/bin/cmake cmake /opt/cmake-${CMAKE_VERSION}/bin/cmake 100 \
     && rm -rf cmake-${CMAKE_VERSION} cmake-${CMAKE_VERSION}.tar.gz \
     # Updated GCC and libstdc++
     && wget https://ftp.gnu.org/gnu/gcc/gcc-${GCC_VERSION}/gcc-${GCC_VERSION}.tar.xz \
     && tar -xvf gcc-${GCC_VERSION}.tar.xz \
     && cd gcc-${GCC_VERSION} \
     && ./contrib/download_prerequisites \
-    && cd .. \
+    && cd /src \
     && mkdir gcc-build \
     && cd gcc-build \
     && ../gcc-${GCC_VERSION}/configure \
@@ -90,7 +93,7 @@ RUN apt update && apt install -y \
         --enable-checking=release \
     && make -j$(nproc) \
     && make install \
-    && cd .. \
+    && cd /src \
     && rm -rf gcc-* \
     && update-alternatives --install /usr/bin/gcc gcc /opt/gcc-${GCC_VERSION}/bin/gcc 100 \
     && update-alternatives --install /usr/bin/g++ g++ /opt/gcc-${GCC_VERSION}/bin/g++ 100 \
@@ -109,12 +112,11 @@ RUN apt update && apt install -y \
         -DLLDB_ENABLE_PYTHON=ON \
         -DPYTHON_EXECUTABLE="$(which python3)" \
     && cmake --build . --target install \
-    && cd .. \
+    && cd /src \
     # && update-alternatives --install /usr/bin/clang clang /usr/bin/clang-${LLVM_VERSION} 100 \
     # && update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-${LLVM_VERSION} 100 \
-    && apt clean
     # Vulkan SDK
-RUN mkdir -p /opt/vulkan \
+    && mkdir -p /opt/vulkan \
     && cd /opt/vulkan \
     && wget https://sdk.lunarg.com/sdk/download/${VULKAN_SDK_VERSION}/linux/vulkansdk-linux-x86_64-${VULKAN_SDK_VERSION}.tar.xz \
     && tar -xvf vulkansdk-linux-x86_64-${VULKAN_SDK_VERSION}.tar.xz \
@@ -126,4 +128,7 @@ RUN mkdir -p /opt/vulkan \
     && rm -f vulkansdk-linux-x86_64-${VULKAN_SDK_VERSION}.tar.xz \
     && ls -la ${VULKAN_SDK_VERSION} \
     && . ${VULKAN_SDK_VERSION}/setup-env.sh \
-    && ./${VULKAN_SDK_VERSION}/vulkansdk --skip-deps --maxjobs
+    && ./${VULKAN_SDK_VERSION}/vulkansdk --skip-deps --maxjobs \
+    && apt clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /src

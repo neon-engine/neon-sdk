@@ -25,7 +25,6 @@ RUN apt update && apt install -y \
         mingw-w64 \
         sudo \
         libglm-dev \
-        cmake \
         libxcb-dri3-0 \
         libxcb-present0 \
         libpciaccess0 \
@@ -33,8 +32,6 @@ RUN apt update && apt install -y \
         libxcb-keysyms1-dev \
         libxcb-dri3-dev \
         libx11-dev \
-        g++ \
-        gcc \
         libwayland-dev \
         libxrandr-dev \
         libxcb-randr0-dev \
@@ -46,15 +43,22 @@ RUN apt update && apt install -y \
         liblz4-dev \
         libzstd-dev \
         ocaml-core \
-        ninja-build \
         pkg-config \
-        libxml2-dev \
         wayland-protocols \
         python3-jsonschema \
 	    clang-format \
         qtbase5-dev \
         qt6-base-dev \
         libxcb-glx0-dev \
+        python3 \
+        python3-dev \
+        swig \
+        libedit-dev \
+        libncurses5-dev \
+        libxml2-dev \
+        zlib1g-dev \
+        libffi-dev \
+        liblzma-dev \
     && wget -O ninja.tar.gz ${NINJA_RELEASE_URL}/v${NINJA_VERSION}/ninja-${NINJA_VERSION}_$(uname -m)-linux-gnu.tar.gz \
     && tar --strip-components=1 -xzf ninja.tar.gz \
     && mv ninja /opt/ninja \
@@ -68,6 +72,7 @@ RUN apt update && apt install -y \
     && make -j$(nproc) \
     && make install \
     && cd .. \
+    && update-alternatives --install /usr/bin/cmake cmake /opt/cmake-${CMAKE_VERSION} 100 \
     && rm -rf cmake-${CMAKE_VERSION} cmake-${CMAKE_VERSION}.tar.gz \
     # Updated GCC and libstdc++
     && wget https://ftp.gnu.org/gnu/gcc/gcc-${GCC_VERSION}/gcc-${GCC_VERSION}.tar.xz \

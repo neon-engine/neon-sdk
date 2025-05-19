@@ -5,7 +5,7 @@ set -euo pipefail
 cd /src
 wget -O ninja.tar.gz ${NINJA_RELEASE_URL}/v${NINJA_VERSION}/ninja-${NINJA_VERSION}_$(uname -m)-linux-gnu.tar.gz
 tar --strip-components=1 -xzf ninja.tar.gz
-mv ninja ${NEON_SDK_PATH}/neon-sdk/ninja
+mv ninja ${NEON_SDK_PATH}/ninja
 update-alternatives --install /usr/bin/ninja ninja ${NEON_SDK_PATH}/ninja 100
 rm -f ninja.tar.gz
 cd

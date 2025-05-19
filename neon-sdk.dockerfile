@@ -76,6 +76,6 @@ RUN apt update && apt install -y \
         libffi-dev \
         liblzma-dev \
     && mkdir -p /src \
-    apt clean \
-    rm -rf /var/lib/apt/lists/*
-
+    && apt clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && build-neon-sdk

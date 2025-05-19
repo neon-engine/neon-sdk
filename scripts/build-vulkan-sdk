@@ -5,14 +5,14 @@ set -euo pipefail
 mkdir -p ${NEON_SDK_PATH}/neon-sdk/vulkan
 cd ${NEON_SDK_PATH}/neon-sdk/vulkan
 wget https://sdk.lunarg.com/sdk/download/${VULKAN_SDK_VERSION}/linux/vulkansdk-linux-x86_64-${VULKAN_SDK_VERSION}.tar.xz
-tar -xvf vulkansdk-linux-x86_64-${VULKAN_SDK_VERSION}.tar.xz
- ${VULKAN_SDK_VERSION}/setup-env.sh
- ${VULKAN_SDK_VERSION}/vulkansdk
- ${VULKAN_SDK_VERSION}/LICENSE.txt
- ${VULKAN_SDK_VERSION}/README.txt
+tar -xvf vulkansdk-linux-x86_64-${VULKAN_SDK_VERSION}.tar.xz \
+ ${VULKAN_SDK_VERSION}/setup-env.sh \
+ ${VULKAN_SDK_VERSION}/vulkansdk \
+ ${VULKAN_SDK_VERSION}/LICENSE.txt \
+ ${VULKAN_SDK_VERSION}/README.txt \
  ${VULKAN_SDK_VERSION}/config/vk_layer_settings.txt
 rm -f vulkansdk-linux-x86_64-${VULKAN_SDK_VERSION}.tar.xz
 ls -la ${VULKAN_SDK_VERSION}
 . ${VULKAN_SDK_VERSION}/setup-env.sh
 ./${VULKAN_SDK_VERSION}/vulkansdk --skip-deps --maxjobs
-cd
+cd /

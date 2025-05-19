@@ -79,5 +79,9 @@ RUN mkdir -p ${NEON_SDK_PATH} \
         liblzma-dev \
     && mkdir -p /src \
     && apt clean \
-    && rm -rf /var/lib/apt/lists/* \
-    && build-neon-sdk
+    && rm -rf /var/lib/apt/lists/*
+RUN install-ninja
+RUN build-cmake
+RUN build-gcc
+RUN build-llvm
+RUN build-vulkan-sdk

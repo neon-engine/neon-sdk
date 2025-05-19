@@ -10,16 +10,16 @@ cd gcc-${GCC_VERSION}
 cd /src
 mkdir gcc-build
 cd gcc-build
-../gcc-${GCC_VERSION}/configure
- --prefix=${NEON_SDK_PATH}/gcc-${GCC_VERSION}
- --enable-languages=c,c++
- --disable-multilib
- --disable-bootstrap
+../gcc-${GCC_VERSION}/configure \
+ --prefix=${NEON_SDK_PATH}/gcc-${GCC_VERSION} \
+ --enable-languages=c,c++ \
+ --disable-multilib \
+ --disable-bootstrap \
  --enable-checking=release
 make -j$(nproc)
 make install
 cd /src
-rm -rf gcc-*
 update-alternatives --install /usr/bin/gcc gcc ${NEON_SDK_PATH}/gcc-${GCC_VERSION}/bin/gcc 100
 update-alternatives --install /usr/bin/g++ g++ ${NEON_SDK_PATH}/gcc-${GCC_VERSION}/bin/g++ 100
-cd
+rm -rf gcc-*
+cd /

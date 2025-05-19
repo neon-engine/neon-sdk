@@ -8,4 +8,4 @@ tar --strip-components=1 -xzf ninja.tar.gz
 mv ninja ${NEON_SDK_PATH}/ninja
 update-alternatives --install /usr/bin/ninja ninja ${NEON_SDK_PATH}/ninja 100
 rm -f ninja.tar.gz
-cd
+cd /

@@ -12,4 +12,4 @@ make install
 cd /src
 update-alternatives --install /usr/bin/cmake cmake ${NEON_SDK_PATH}/cmake-${CMAKE_VERSION}/bin/cmake 100
 rm -rf cmake-${CMAKE_VERSION} cmake-${CMAKE_VERSION}.tar.gz
-cd
+cd /

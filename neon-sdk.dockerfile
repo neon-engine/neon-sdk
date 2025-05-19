@@ -30,7 +30,9 @@ ENV LD_LIBRARY_PATH=${NEON_SDK_PATH}/gcc-${GCC_VERSION}/lib64:$LD_LIBRARY_PATH
 COPY scripts/* /usr/bin
 COPY build-neon-sdk /usr/bin
 
-RUN apt update && apt install -y \
+RUN mkdir -p ${NEON_SDK_PATH} \
+    && apt update \
+    && apt install -y \
         build-essential \
         wget \
         lsb-release \

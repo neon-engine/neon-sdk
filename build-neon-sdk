@@ -1,0 +1,9 @@
+#!/bin/bash
+
+set -euo pipefail
+
+install-ninja
+build-cmake
+build-gcc
+build-llvm
+build-vulkan-sdk

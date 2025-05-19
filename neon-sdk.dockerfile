@@ -1,18 +1,33 @@
 ARG ARCH=amd64
-ARG BASE_IMAGE=ubuntu:22.04
+
 FROM --platform=${ARCH} ${BASE_IMAGE}
 
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=Etc/UTC
-ARG NINJA_RELEASE_URL=https://github.com/Kitware/ninja/releases/download
-ARG NINJA_VERSION=1.11.1.g95dee.kitware.jobserver-1
-ARG GCC_VERSION=13.3.0
-ARG LLVM_VERSION=llvmorg-20.1.4
-ARG CMAKE_VERSION=3.28.3
-ARG VULKAN_SDK_VERSION=1.4.313.0
 
-ENV PATH=/opt/gcc-${GCC_VERSION}/bin:$PATH
-ENV LD_LIBRARY_PATH=/opt/gcc-${GCC_VERSION}/lib64:$LD_LIBRARY_PATH
+ARG NINJA_RELEASE_URL_ARG=https://github.com/Kitware/ninja/releases/download
+ENV NINJA_RELEASE_URL=${NINJA_RELEASE_URL_ARG}
+
+ARG NINJA_VERSION_ARG=1.11.1.g95dee.kitware.jobserver-1
+ENV NINJA_VERSION=${NINJA_VERSION_ARG}
+
+ARG GCC_VERSION_ARG=13.3.0
+ENV GCC_VERSION=${GCC_VERSION_ARG}
+
+ARG LLVM_VERSION_ARG=llvmorg-20.1.4
+ENV LLVM_VERSION=${LLVM_VERSION_ARG}
+
+ARG CMAKE_VERSION_ARG=3.28.3
+ENV CMAKE_VERSION=${CMAKE_VERSION_ARG}
+
+ARG VULKAN_SDK_VERSION_ARG=1.4.313.0
+ENV VULKAN_SDK_VERSION=${VULKAN_SDK_VERSION_ARG}
+
+ENV NEON_SDK_PATH=/opt/neon-sdk
+ENV PATH=${NEON_SDK_PATH}/gcc-${GCC_VERSION}/bin:$PATH
+ENV LD_LIBRARY_PATH=${NEON_SDK_PATH}/gcc-${GCC_VERSION}/lib64:$LD_LIBRARY_PATH
+
+COPY scripts/* /usr/bin
 
 RUN apt update && apt install -y \
         build-essential \
@@ -60,75 +75,6 @@ RUN apt update && apt install -y \
         libffi-dev \
         liblzma-dev \
     && mkdir -p /src \
-    && cd /src \
-    # Install Ninja
-    && wget -O ninja.tar.gz ${NINJA_RELEASE_URL}/v${NINJA_VERSION}/ninja-${NINJA_VERSION}_$(uname -m)-linux-gnu.tar.gz \
-    && tar --strip-components=1 -xzf ninja.tar.gz \
-    && mv ninja /opt/ninja \
-    && update-alternatives --install /usr/bin/ninja ninja /opt/ninja 100 \
-    && rm -f ninja.tar.gz \
-    # Build CMake from source
-    && wget https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}.tar.gz \
-    && tar -zxvf cmake-${CMAKE_VERSION}.tar.gz \
-    && cd cmake-${CMAKE_VERSION} \
-    && ./bootstrap --prefix=/opt/cmake-${CMAKE_VERSION} --parallel=$(nproc) \
-    && make -j$(nproc) \
-    && make install \
-    && cd /src \
-    && update-alternatives --install /usr/bin/cmake cmake /opt/cmake-${CMAKE_VERSION}/bin/cmake 100 \
-    && rm -rf cmake-${CMAKE_VERSION} cmake-${CMAKE_VERSION}.tar.gz \
-    # Updated GCC and libstdc++
-    && wget https://ftp.gnu.org/gnu/gcc/gcc-${GCC_VERSION}/gcc-${GCC_VERSION}.tar.xz \
-    && tar -xvf gcc-${GCC_VERSION}.tar.xz \
-    && cd gcc-${GCC_VERSION} \
-    && ./contrib/download_prerequisites \
-    && cd /src \
-    && mkdir gcc-build \
-    && cd gcc-build \
-    && ../gcc-${GCC_VERSION}/configure \
-        --prefix=/opt/gcc-${GCC_VERSION} \
-        --enable-languages=c,c++ \
-        --disable-multilib \
-        --disable-bootstrap \
-        --enable-checking=release \
-    && make -j$(nproc) \
-    && make install \
-    && cd /src \
-    && rm -rf gcc-* \
-    && update-alternatives --install /usr/bin/gcc gcc /opt/gcc-${GCC_VERSION}/bin/gcc 100 \
-    && update-alternatives --install /usr/bin/g++ g++ /opt/gcc-${GCC_VERSION}/bin/g++ 100 \
-    # LLVM/clang
-    && git clone --depth 1 --branch ${LLVM_VERSION} https://github.com/llvm/llvm-project.git \
-    && cd llvm-project \
-    && mkdir build \
-    && cd build \
-    && cmake -G Ninja ../llvm-project/llvm \
-        -DCMAKE_BUILD_TYPE=Release \
-        -DCMAKE_INSTALL_PREFIX=/opt/llvm-${LLVM_VERSION} \
-        -DLLVM_ENABLE_PROJECTS="clang;lld;lldb" \
-        -DLLVM_ENABLE_RUNTIMES="compiler-rt;libcxx;libcxxabi" \
-        -DLLVM_TARGETS_TO_BUILD="X86;AArch64" \
-        -DLLVM_ENABLE_ASSERTIONS=ON \
-        -DLLDB_ENABLE_PYTHON=ON \
-        -DPYTHON_EXECUTABLE="$(which python3)" \
-    && cmake --build . --target install \
-    && cd /src \
-    # && update-alternatives --install /usr/bin/clang clang /usr/bin/clang-${LLVM_VERSION} 100 \
-    # && update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-${LLVM_VERSION} 100 \
-    # Vulkan SDK
-    && mkdir -p /opt/vulkan \
-    && cd /opt/vulkan \
-    && wget https://sdk.lunarg.com/sdk/download/${VULKAN_SDK_VERSION}/linux/vulkansdk-linux-x86_64-${VULKAN_SDK_VERSION}.tar.xz \
-    && tar -xvf vulkansdk-linux-x86_64-${VULKAN_SDK_VERSION}.tar.xz \
-        ${VULKAN_SDK_VERSION}/setup-env.sh \
-        ${VULKAN_SDK_VERSION}/vulkansdk \
-        ${VULKAN_SDK_VERSION}/LICENSE.txt \
-        ${VULKAN_SDK_VERSION}/README.txt \
-        ${VULKAN_SDK_VERSION}/config/vk_layer_settings.txt \
-    && rm -f vulkansdk-linux-x86_64-${VULKAN_SDK_VERSION}.tar.xz \
-    && ls -la ${VULKAN_SDK_VERSION} \
-    && . ${VULKAN_SDK_VERSION}/setup-env.sh \
-    && ./${VULKAN_SDK_VERSION}/vulkansdk --skip-deps --maxjobs \
-    && apt clean \
-    && rm -rf /var/lib/apt/lists/* \
-    && rm -rf /src
+    apt clean \
+    rm -rf /var/lib/apt/lists/*
+

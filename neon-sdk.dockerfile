@@ -5,33 +5,7 @@ FROM --platform=${ARCH} ${BASE_IMAGE}
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=Etc/UTC
 
-ARG NINJA_RELEASE_URL_ARG=https://github.com/Kitware/ninja/releases/download
-ENV NINJA_RELEASE_URL=${NINJA_RELEASE_URL_ARG}
-
-ARG NINJA_VERSION_ARG=1.11.1.g95dee.kitware.jobserver-1
-ENV NINJA_VERSION=${NINJA_VERSION_ARG}
-
-ARG GCC_VERSION_ARG=13.3.0
-ENV GCC_VERSION=${GCC_VERSION_ARG}
-
-ARG LLVM_VERSION_ARG=llvmorg-20.1.4
-ENV LLVM_VERSION=${LLVM_VERSION_ARG}
-
-ARG CMAKE_VERSION_ARG=3.28.3
-ENV CMAKE_VERSION=${CMAKE_VERSION_ARG}
-
-ARG VULKAN_SDK_VERSION_ARG=1.4.313.0
-ENV VULKAN_SDK_VERSION=${VULKAN_SDK_VERSION_ARG}
-
-ENV NEON_SDK_PATH=/opt/neon-sdk
-ENV PATH=${NEON_SDK_PATH}/gcc-${GCC_VERSION}/bin:$PATH
-ENV LD_LIBRARY_PATH=${NEON_SDK_PATH}/gcc-${GCC_VERSION}/lib64:$LD_LIBRARY_PATH
-
-COPY scripts/* /usr/bin
-COPY build-neon-sdk /usr/bin
-
-RUN mkdir -p ${NEON_SDK_PATH} \
-    && apt update \
+RUN apt update \
     && apt install -y \
         build-essential \
         wget \
@@ -78,10 +52,6 @@ RUN mkdir -p ${NEON_SDK_PATH} \
         libffi-dev \
         liblzma-dev \
     && mkdir -p /src \
+    && mkdir -p /build \
     && apt clean \
     && rm -rf /var/lib/apt/lists/*
-RUN install-ninja
-RUN build-cmake
-RUN build-gcc
-RUN build-llvm
-RUN build-vulkan-sdk

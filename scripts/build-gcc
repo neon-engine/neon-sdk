@@ -2,12 +2,12 @@
 
 set -euo pipefail
 
-cd /src
+cd /build
 wget https://ftp.gnu.org/gnu/gcc/gcc-${GCC_VERSION}/gcc-${GCC_VERSION}.tar.xz
 tar -xvf gcc-${GCC_VERSION}.tar.xz
 cd gcc-${GCC_VERSION}
 ./contrib/download_prerequisites
-cd /src
+cd /build
 mkdir gcc-build
 cd gcc-build
 ../gcc-${GCC_VERSION}/configure \
@@ -18,8 +18,8 @@ cd gcc-build
  --enable-checking=release
 make -j$(nproc)
 make install
-cd /src
+cd /build
 update-alternatives --install /usr/bin/gcc gcc ${NEON_SDK_PATH}/gcc-${GCC_VERSION}/bin/gcc 100
 update-alternatives --install /usr/bin/g++ g++ ${NEON_SDK_PATH}/gcc-${GCC_VERSION}/bin/g++ 100
 rm -rf gcc-*
-cd /
+cd /src

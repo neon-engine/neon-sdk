@@ -2,14 +2,14 @@
 
 set -euo pipefail
 
-cd /src
+cd /build
 wget https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}.tar.gz
 tar -zxvf cmake-${CMAKE_VERSION}.tar.gz
 cd cmake-${CMAKE_VERSION}
 ./bootstrap --prefix=${NEON_SDK_PATH}/cmake-${CMAKE_VERSION} --parallel=$(nproc)
 make -j$(nproc)
 make install
-cd /src
+cd /build
 update-alternatives --install /usr/bin/cmake cmake ${NEON_SDK_PATH}/cmake-${CMAKE_VERSION}/bin/cmake 100
 rm -rf cmake-${CMAKE_VERSION} cmake-${CMAKE_VERSION}.tar.gz
-cd /
+cd /src

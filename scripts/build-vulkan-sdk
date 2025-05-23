@@ -15,4 +15,4 @@ rm -f vulkansdk-linux-x86_64-${VULKAN_SDK_VERSION}.tar.xz
 ls -la ${VULKAN_SDK_VERSION}
 . ${VULKAN_SDK_VERSION}/setup-env.sh
 ./${VULKAN_SDK_VERSION}/vulkansdk --skip-deps --maxjobs
-cd /
+cd /src

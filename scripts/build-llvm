@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-cd /src
+cd /build
 git clone --depth 1 --branch ${LLVM_VERSION} https://github.com/llvm/llvm-project.git
 cd llvm-project
 mkdir build
@@ -11,7 +11,7 @@ cmake -G Ninja ../llvm \
  -DCMAKE_BUILD_TYPE=Release \
  -DCMAKE_INSTALL_PREFIX=${NEON_SDK_PATH}/llvm-${LLVM_VERSION} \
  -DLLVM_ENABLE_PROJECTS="clang;lld;lldb" \
- -DLLVM_ENABLE_RUNTIMES="compiler-rt;libcxx;libcxxabi" \
+ -DLLVM_ENABLE_RUNTIMES="compiler-rt;libcxx;libcxxabi;libunwind" \
  -DLLVM_TARGETS_TO_BUILD="X86;AArch64" \
  -DLLVM_ENABLE_ASSERTIONS=ON \
  -DLLDB_ENABLE_PYTHON=ON \
@@ -19,4 +19,4 @@ cmake -G Ninja ../llvm \
 cmake --build . --target install
 update-alternatives --install /usr/bin/clang clang /usr/bin/clang-${LLVM_VERSION} 100
 update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-${LLVM_VERSION} 100 
-cd /
+cd /src

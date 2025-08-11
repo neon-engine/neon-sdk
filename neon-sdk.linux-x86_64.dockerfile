@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 debian:12
+FROM debian:12
 
 ARG ARCH=x86_64
 ENV ARCH=${ARCH}

@@ -10,18 +10,21 @@ set -euo pipefail
 SYSROOT=${SDK}/sysroots/${ARCH}-gnu-${DEBIAN_RELEASE}
 mkdir -p "${SYSROOT}"
 
-HOST_ARCH=$(uname -m)
-declare CHROOT_ARCH
+cat << EOF > "multistrap.conf"
+[General]
+arch=${ARCH_ALT}
+directory=${SYSROOT}
+noauth=true
+unpack=true
+aptsources=debian
+bootstrap=base
 
-if [[ "${HOST_ARCH}" == "${ARCH_ALT}" ]]; then
-  CHROOT_ARCH="${HOST_ARCH}"
-else
-  CHROOT_ARCH="${HOST_ARCH} ${ARCH_ALT}"
-fi
+[Debian]
+source=http://deb.debian.org/debian
+suite=${DEBIAN_RELEASE}
+components=main
+omitdebsrc=true
+packages=libc6:${ARCH_ALT} linux-libc-dev:${ARCH_ALT} libstdc++6:${ARCH_ALT} libstdc++-12-dev:${ARCH_ALT} libgcc-s1:${ARCH_ALT} zlib1g:${ARCH_ALT} zlib1g-dev:${ARCH_ALT}
+EOF
 
-mmdebstrap --mode=chrootless --variant=minbase \
-  --architectures="${CHROOT_ARCH}" \
-  --keyring=/usr/share/keyrings/debian-archive-keyring.gpg \
-  --setup-hook='mkdir -p "$1/dev"; :> "$1/dev/null"; chmod 666 "$1/dev/null"' \
-  --include="binutils:${ARCH_ALT},libc6-dev:${ARCH_ALT},linux-libc-dev:${ARCH_ALT},libstdc++-12-dev:${ARCH_ALT},libgcc-s1:${ARCH_ALT},pkg-config:${ARCH_ALT}" \
-  "${DEBIAN_RELEASE}" "${SYSROOT}" http://deb.debian.org/debian
+multistrap -f multistrap.conf

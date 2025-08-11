@@ -20,4 +20,5 @@ apt-get install -y --no-install-recommends \
     lsb-release \
     wget \
     software-properties-common \
-    gnupg
+    gnupg \
+    multistrap

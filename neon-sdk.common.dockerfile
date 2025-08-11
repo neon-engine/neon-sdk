@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 debian:12
+FROM debian:12
 
 ARG ARCH=x86_64
 ENV ARCH=${ARCH}
@@ -21,6 +21,5 @@ COPY scripts/ /usr/local/bin/scripts/
 
 RUN chmod +x /usr/local/bin/scripts/*.sh \
   && /usr/local/bin/scripts/setup-base.sh \
-  && /usr/local/bin/scripts/setup-sysroot.sh \
-  && /usr/local/bin/scripts/setup-scripts.sh \
+  && apt-get install -y --no-install-recommends mingw-w64 \
   && /usr/local/bin/scripts/cleanup.sh

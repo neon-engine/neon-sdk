@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euo pipefail
+
 : "${SDK:?SDK environment variable is not set}"
 : "${DEBIAN_RELEASE:?DEBIAN_RELEASE environment variable is not set}"
 

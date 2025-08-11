@@ -2,20 +2,9 @@
 
 set -euo pipefail
 
-if [[ -z "${DEBIAN_RELEASE}" ]]; then
-  echo "DEBIAN_RELEASE must be set"
-  exit 1
-fi
-
-if [[ -z "${LLVM_MAJOR}" ]]; then
-  echo "LLVM_MAJOR must be set"
-  exit 1
-fi
-
-if [[ -z "${SDK}" ]]; then
-  echo "SDK must be set"
-  exit 1
-fi
+: "${SDK:?SDK environment variable is not set}"
+: "${DEBIAN_RELEASE:?DEBIAN_RELEASE environment variable is not set}"
+: "${LLVM_MAJOR:?LLVM_MAJOR environment variable is not set}"
 
 echo "deb http://apt.llvm.org/${DEBIAN_RELEASE}/ llvm-toolchain-${DEBIAN_RELEASE}-${LLVM_MAJOR} main" > /etc/apt/sources.list.d/llvm.list
 

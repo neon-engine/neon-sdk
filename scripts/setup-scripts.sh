@@ -2,6 +2,9 @@
 
 set -euo pipefail
 
+: "${SDK:?SDK environment variable is not set}"
+: "${LLVM_MAJOR:?LLVM_MAJOR environment variable is not set}"
+
 mkdir -p ${SDK}/bin ${SDK}/toolchains
 
 cat > ${SDK}/bin/x86_64-gnu-clang <<EOF

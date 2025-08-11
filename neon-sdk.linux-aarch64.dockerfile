@@ -1,6 +1,7 @@
 FROM debian:12
 
 ARG LLVM_MAJOR=18
+ENV LLVM_MAJOR=18
 ARG DEBIAN_RELEASE=bookworm
 ARG AARCH_RELEASE=bookworm
 ENV SDK=/opt/sdk
@@ -8,35 +9,17 @@ ENV DEBIAN_FRONTEND=noninteractive
 SHELL ["/bin/bash","-euo","pipefail","-c"]
 
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends \
-    ca-certificates \
-    curl \
-    xz-utils \
-    gnupg \
-    wget \
-    lsb-release \
-    file \
-    make \
-    cmake \
-    pkg-config \
-    patchelf \
-    mmdebstrap \
-    binutils \
-    gpgv \
-    debian-archive-keyring \
- && rm -rf /var/lib/apt/lists/*
+    && apt-get install -y --no-install-recommends \
+      ca-certificates \
+      curl \
+      mmdebstrap \
+      gpgv \
+      debian-archive-keyring \
+      gpg \
+      wget \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN echo "deb http://apt.llvm.org/${DEBIAN_RELEASE}/ llvm-toolchain-${DEBIAN_RELEASE}-${LLVM_MAJOR} main" \
-      >/etc/apt/sources.list.d/llvm.list \
- && wget -O- https://apt.llvm.org/llvm-snapshot.gpg.key | gpg --dearmor >/etc/apt/trusted.gpg.d/apt.llvm.org.gpg \
- && apt-get update && apt-get install -y --no-install-recommends \
-      clang-${LLVM_MAJOR} clang-tools-${LLVM_MAJOR} lld-${LLVM_MAJOR} \
-      llvm-${LLVM_MAJOR} llvm-${LLVM_MAJOR}-tools \
- && rm -rf /var/lib/apt/lists/* \
- && mkdir -p ${SDK}/llvm-${LLVM_MAJOR}/bin \
- && for b in clang clang++ lld llvm-ar llvm-ranlib llvm-strip llvm-nm; do \
-      ln -s /usr/bin/${b}-${LLVM_MAJOR} ${SDK}/llvm-${LLVM_MAJOR}/bin/${b}; \
-    done
+RUN 
 
 ENV SYSROOT_A64=${SDK}/sysroots/aarch64-gnu-${AARCH_RELEASE}
 RUN mkdir -p "${SYSROOT_A64}" \
@@ -45,7 +28,11 @@ RUN mkdir -p "${SYSROOT_A64}" \
     --keyring=/usr/share/keyrings/debian-archive-keyring.gpg \
     --setup-hook='mkdir -p "$1/dev"; :> "$1/dev/null"; chmod 666 "$1/dev/null"' \
     --include=g++,binutils,libc6-dev,linux-libc-dev,pkg-config \
-    ${AARCH_RELEASE} "${SYSROOT_A64}" http://deb.debian.org/debian \
+    ${DEBIAN_RELEASE} "${SYSROOT_A64}" http://deb.debian.org/debian \
+ && chroot "${SYSROOT_A64}" apt-get update \
+ && chroot "${SYSROOT_A64}" apt-get install -y --no-install-recommends \
+      g++ binutils libc6-dev linux-libc-dev pkg-config \
+ && chroot "${SYSROOT_A64}" apt-get clean \
  && rm -rf "${SYSROOT_A64}"/var/lib/apt/lists/*
 
 RUN mkdir -p ${SDK}/bin ${SDK}/toolchains

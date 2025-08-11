@@ -14,17 +14,25 @@ cat << EOF > "multistrap.conf"
 [General]
 arch=${ARCH_ALT}
 directory=${SYSROOT}
-noauth=true
+cleanup=true
+noauth=false
 unpack=true
-aptsources=debian
-bootstrap=base
+aptsources=Debian
+bootstrap=Debian
 
 [Debian]
+packages=libc6 \
+  linux-libc-dev \
+  libstdc++6 \
+  libstdc++-12-dev \
+  libgcc-s1 \
+  zlib1g \
+  zlib1g-dev \
+  libvulkan-dev \
+  vulkan-validationlayers
 source=http://deb.debian.org/debian
+keyring=debian-archive-keyring
 suite=${DEBIAN_RELEASE}
-components=main
-omitdebsrc=true
-packages=libc6:${ARCH_ALT} linux-libc-dev:${ARCH_ALT} libstdc++6:${ARCH_ALT} libstdc++-12-dev:${ARCH_ALT} libgcc-s1:${ARCH_ALT} zlib1g:${ARCH_ALT} zlib1g-dev:${ARCH_ALT}
 EOF
 
 multistrap -f multistrap.conf

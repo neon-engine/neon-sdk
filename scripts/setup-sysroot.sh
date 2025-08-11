@@ -6,7 +6,7 @@ set -euo pipefail
 : "${DEBIAN_RELEASE:?DEBIAN_RELEASE environment variable is not set}"
 
 SYSROOT=${SDK}/sysroots/x86_64-gnu-${DEBIAN_RELEASE}
-RUN mkdir -p "${SYSROOT}"
+mkdir -p "${SYSROOT}"
 
 mmdebstrap --mode=chrootless --variant=minbase \
   --architectures=amd64 \

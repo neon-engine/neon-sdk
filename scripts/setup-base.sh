@@ -8,9 +8,6 @@ apt-get install -y --no-install-recommends \
     ca-certificates \
     curl \
     xz-utils \
-    gnupg \
-    wget \
-    lsb-release \
     file \
     make \
     cmake \
@@ -19,4 +16,8 @@ apt-get install -y --no-install-recommends \
     mmdebstrap \
     binutils \
     gpgv \
-    debian-archive-keyring
+    debian-archive-keyring \
+    lsb-release \
+    wget \
+    software-properties-common \
+    gnupg

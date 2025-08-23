@@ -12,7 +12,8 @@ ENV LLVM_MAJOR=${LLVM_MAJOR}
 ARG DEBIAN_RELEASE=bookworm
 ENV DEBIAN_RELEASE=${DEBIAN_RELEASE}
 
-ENV SDK=/opt/sdk
+ARG SDK_PATH=/opt/neon/sdk
+ENV SDK=${SDK_PATH}
 ENV DEBIAN_FRONTEND=noninteractive
 
 SHELL ["/bin/bash","-euo","pipefail","-c"]

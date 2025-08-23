@@ -29,7 +29,8 @@ packages=libc6 \
   zlib1g \
   zlib1g-dev \
   libvulkan-dev \
-  vulkan-validationlayers
+  vulkan-validationlayers \
+  linux-headers-generic
 source=http://deb.debian.org/debian
 keyring=debian-archive-keyring
 suite=${DEBIAN_RELEASE}

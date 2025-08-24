@@ -4,6 +4,10 @@ set -euo pipefail
 
 target=${1:-"linux-x86_64"}
 
+if [[ "${target}" == "linux-host" ]]; then
+  target="linux-host-$(uname -m)"
+fi
+
 echo "Building Neon SDK container image for target: $target"
 
 TAG="neon-sdk.${target}"

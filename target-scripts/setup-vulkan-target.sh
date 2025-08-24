@@ -17,9 +17,9 @@ tar -xvf vulkansdk-linux-x86_64-${VULKAN_SDK_VERSION}.0.tar.xz \
 rm -f vulkansdk-linux-x86_64-${VULKAN_SDK_VERSION}.0.tar.xz
 
 cd ${VULKAN_SDK_VERSION}.0
-source setup-env.sh
+# source setup-env.sh
 
-./vulkansdk.modified --skip-deps --maxjobs \
+./vulkansdk --skip-deps --maxjobs \
     headers \
     loader \
     layers \

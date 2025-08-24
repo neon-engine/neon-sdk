@@ -21,7 +21,7 @@ fi
 eval set -- "$TEMP"
 
 target="linux-x86_64"
-declare host
+host=$(uname -m)
 
 while true; do
   case "$1" in
@@ -49,7 +49,7 @@ while true; do
 done
 
 HOST_TAG="neon-sdk.${target}-$(uname -m)"
-HOST_DOCKERFILE="neon-sdk.linux_host.dockerfile"
+HOST_DOCKERFILE="neon-sdk.linux-host.dockerfile"
 
 TAG="neon-sdk.${target}"
 DOCKERFILE="${TAG}.dockerfile"
@@ -77,10 +77,11 @@ else
   exit 1
 fi
 
-echo "Building Neon SDK container image for the host: ${host}"
+echo "==== Building Neon SDK cross-compile host for: ${host} ===="
 ${CONTAINER_ENGINE} ${CONTAINER_COMMAND} -t ${HOST_TAG} -f ${HOST_DOCKERFILE}
 
-echo "Building Neon SDK container image for target: ${target}"
+
+echo "==== Building Neon SDK cross-compile target for: ${host} ===="
 ${CONTAINER_ENGINE} ${CONTAINER_COMMAND} -t ${TAG} -f ${DOCKERFILE}
 
 podman create --name ${HOST_TAG}-container ${HOST_TAG}:latest

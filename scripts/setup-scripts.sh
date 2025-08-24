@@ -29,7 +29,7 @@ EOF
 
 chmod +x ${SDK}/bin/*
 
-cat > ${SDK}/toolchains/${ARCH}-gnu-clang.cmake <<EOF
+cat > ${SDK}/toolchains/${ARCH}-gnu-clang-toolchain.cmake <<EOF
 set(CMAKE_SYSTEM_NAME Linux)
 set(CMAKE_SYSTEM_PROCESSOR ${ARCH})
 set(CMAKE_SYSROOT "${SDK}/sysroot/${ARCH}-gnu-bookworm")
@@ -48,4 +48,4 @@ printf '%s\n' \
   "export STRIP=${SDK}/llvm-${LLVM_MAJOR}/bin/llvm-strip" \
   "export PKG_CONFIG_SYSROOT_DIR=${SDK}/sysroot/${ARCH}-gnu-bookworm" \
   "export PKG_CONFIG_LIBDIR=${SDK}/sysroot/${ARCH}-gnu-bookworm/usr/lib/${ARCH}-linux-gnu/pkgconfig:${SDK}/sysroot/${ARCH}-gnu-bookworm/usr/lib/pkgconfig:${SDK}/sysroot/${ARCH}-gnu-bookworm/usr/share/pkgconfig" \
-> ${SDK}/env-${ARCH}-linux.sh
+> ${SDK}/environment.sh

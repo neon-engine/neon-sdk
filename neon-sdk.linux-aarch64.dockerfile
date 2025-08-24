@@ -1,10 +1,7 @@
 FROM debian:12
 
-ARG ARCH=aarch64
-ENV ARCH=${ARCH}
-
-ARG ARCH_ALT=arm64
-ENV ARCH_ALT=${ARCH_ALT}
+ENV ARCH=aarch64
+ENV ARCH_ALT=arm64
 
 ARG LLVM_MAJOR=20
 ENV LLVM_MAJOR=${LLVM_MAJOR}
@@ -14,6 +11,7 @@ ENV DEBIAN_RELEASE=${DEBIAN_RELEASE}
 
 ARG SDK_PATH=/opt/neon/sdk
 ENV SDK=${SDK_PATH}/${ARCH}
+
 ENV DEBIAN_FRONTEND=noninteractive
 
 SHELL ["/bin/bash","-euo","pipefail","-c"]

@@ -2,12 +2,11 @@
 
 set -euo pipefail
 
-: "${SDK_ROOT:?SDK_ROOT environment variable is not set}"
 : "${SDK:?SDK environment variable is not set}"
 : "${DEBIAN_RELEASE:?DEBIAN_RELEASE environment variable is not set}"
 : "${LLVM_MAJOR:?LLVM_MAJOR environment variable is not set}"
 
-SYSROOT=${SDK_ROOT}/host/$(uname -m)-gnu-${DEBIAN_RELEASE}
+SYSROOT=${SDK}/host/$(uname -m)-gnu-${DEBIAN_RELEASE}
 
 echo "deb http://apt.llvm.org/${DEBIAN_RELEASE}/ llvm-toolchain-${DEBIAN_RELEASE}-${LLVM_MAJOR} main" > /etc/apt/sources.list.d/llvm.list
 

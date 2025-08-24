@@ -7,13 +7,11 @@ set -euo pipefail
 : "${ARCH:?ARCH environment variable is not set}"
 : "${DEBIAN_RELEASE:?DEBIAN_RELEASE environment variable is not set}"
 
-mkdir -p ${SDK}/bin ${SDK}/toolchains
-
 cat > ${SDK}/bin/${ARCH}-gnu-clang <<EOF
 #!/usr/bin/env bash
 exec ${SDK}/llvm-${LLVM_MAJOR}/bin/clang \
   --target=${ARCH}-linux-gnu \
-  --sysroot=${SDK}/sysroot/${ARCH}-gnu-${DEBIAN_RELEASE} \
+  --sysroot=${SDK}/target/${ARCH}-gnu-${DEBIAN_RELEASE} \
   -fuse-ld=lld \
   "\$@"
 EOF
@@ -22,7 +20,7 @@ cat > ${SDK}/bin/${ARCH}-gnu-clang++ <<EOF
 #!/usr/bin/env bash
 exec ${SDK}/llvm-${LLVM_MAJOR}/bin/clang++ \
   --target=${ARCH}-linux-gnu \
-  --sysroot=${SDK}/sysroot/${ARCH}-gnu-${DEBIAN_RELEASE} \
+  --sysroot=${SDK}/target/${ARCH}-gnu-${DEBIAN_RELEASE} \
   -stdlib=libstdc++ \
   -fuse-ld=lld \
   "\$@"
@@ -33,7 +31,7 @@ chmod +x ${SDK}/bin/*
 cat > ${SDK}/${ARCH}-gnu-toolchain.cmake <<EOF
 set(CMAKE_SYSTEM_NAME Linux)
 set(CMAKE_SYSTEM_PROCESSOR ${ARCH})
-set(CMAKE_SYSROOT "${SDK}/sysroot/${ARCH}-gnu-${DEBIAN_RELEASE}")
+set(CMAKE_SYSROOT "${SDK}/target/${ARCH}-gnu-${DEBIAN_RELEASE}")
 set(CMAKE_C_COMPILER   "${SDK}/bin/${ARCH}-gnu-clang")
 set(CMAKE_CXX_COMPILER "${SDK}/bin/${ARCH}-gnu-clang++")
 set(CMAKE_C_COMPILER_TARGET   "${ARCH}-linux-gnu")
@@ -70,8 +68,8 @@ export CXX=${SDK}/bin/${ARCH}-gnu-clang++
 export AR=${SDK}/llvm-${LLVM_MAJOR}/bin/llvm-ar
 export RANLIB=${SDK}/llvm-${LLVM_MAJOR}/bin/llvm-ranlib
 export STRIP=${SDK}/llvm-${LLVM_MAJOR}/bin/llvm-strip
-export PKG_CONFIG_SYSROOT_DIR=${SDK}/sysroot/${ARCH}-gnu-${DEBIAN_RELEASE}
-export PKG_CONFIG_LIBDIR=${SDK}/sysroot/${ARCH}-gnu-${DEBIAN_RELEASE}/usr/lib/${ARCH}-linux-gnu/pkgconfig:${SDK}/sysroot/${ARCH}-gnu-${DEBIAN_RELEASE}/usr/lib/pkgconfig:${SDK}/sysroot/${ARCH}-gnu-${DEBIAN_RELEASE}/usr/share/pkgconfig
+export PKG_CONFIG_SYSROOT_DIR=${SDK}/target/${ARCH}-gnu-${DEBIAN_RELEASE}
+export PKG_CONFIG_LIBDIR=${SDK}/target/${ARCH}-gnu-${DEBIAN_RELEASE}/usr/lib/${ARCH}-linux-gnu/pkgconfig:${SDK}/target/${ARCH}-gnu-${DEBIAN_RELEASE}/usr/lib/pkgconfig:${SDK}/target/${ARCH}-gnu-${DEBIAN_RELEASE}/usr/share/pkgconfig
 
 # Common flags for all build types
 export COMMON_FLAGS="-pipe"

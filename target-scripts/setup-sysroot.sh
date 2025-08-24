@@ -7,7 +7,7 @@ set -euo pipefail
 : "${ARCH:?ARCH environment variable is not set}"
 : "${ARCH_ALT:?ARCH_ALT environment variable is not set}"
 
-SYSROOT=${SDK}/sysroot/${ARCH}-gnu-${DEBIAN_RELEASE}
+SYSROOT=${SDK}/target/${ARCH}-gnu-${DEBIAN_RELEASE}
 mkdir -p "${SYSROOT}"
 
 cat << EOF > "multistrap.conf"
@@ -33,7 +33,8 @@ packages=libc6 \
   linux-headers-generic \
   libxxf86vm-dev \
   libxi-dev \
-  wayland-dev
+  libwayland-dev \
+  wayland-protocols
 source=http://deb.debian.org/debian
 keyring=debian-archive-keyring
 suite=${DEBIAN_RELEASE}

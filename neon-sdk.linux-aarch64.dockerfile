@@ -3,13 +3,16 @@ FROM debian:12
 ENV ARCH=aarch64
 ENV ARCH_ALT=arm64
 
+ARG LLVM_MAJOR=20
+ENV LLVM_MAJOR=${LLVM_MAJOR}
+
 ARG DEBIAN_RELEASE=bookworm
 ENV DEBIAN_RELEASE=${DEBIAN_RELEASE}
 
 ARG SDK_ROOT=/opt/neon
 ENV SDK_ROOT=${SDK_ROOT}
 ARG SDK_PATH=${SDK_ROOT}/sdk
-ENV SDK=${SDK_PATH}/${ARCH}
+ENV SDK=${SDK_PATH}/target/${ARCH}
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -20,5 +23,4 @@ COPY target-scripts/ /usr/local/bin/scripts/
 RUN chmod +x /usr/local/bin/scripts/*.sh \
   && /usr/local/bin/scripts/setup-base.sh \
   && /usr/local/bin/scripts/setup-sysroot.sh \
-  && /usr/local/bin/scripts/setup-scripts.sh \
   && /usr/local/bin/scripts/cleanup.sh

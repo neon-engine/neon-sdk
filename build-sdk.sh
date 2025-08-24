@@ -7,7 +7,7 @@ function show_help() {
   echo "Build Neon SDK container image"
   echo ""
   echo "Options:"
-  echo "  --target TARGET    Specify build target (default: linux-x86_64)"
+  echo "  --target TARGET    Specify build target (default: x86_64)"
   echo "  --help             Display this help message and exit"
 }
 
@@ -20,7 +20,7 @@ fi
 
 eval set -- "$TEMP"
 
-target="linux-x86_64"
+target="x86_64"
 host=$(uname -m)
 
 while true; do
@@ -48,10 +48,10 @@ while true; do
   esac
 done
 
-HOST_TAG="neon-sdk.${target}-$(uname -m)"
+HOST_TAG="neon-sdk.linux-${target}-$(uname -m)"
 HOST_DOCKERFILE="neon-sdk.linux-host.dockerfile"
 
-TAG="neon-sdk.${target}"
+TAG="neon-sdk.linux-${target}"
 DOCKERFILE="${TAG}.dockerfile"
 
 if [[ ! -f "$DOCKERFILE" ]]; then
@@ -84,10 +84,27 @@ ${CONTAINER_ENGINE} ${CONTAINER_COMMAND} -t ${HOST_TAG} -f ${HOST_DOCKERFILE}
 echo "==== Building Neon SDK cross-compile target for: ${host} ===="
 ${CONTAINER_ENGINE} ${CONTAINER_COMMAND} -t ${TAG} -f ${DOCKERFILE}
 
+echo "==== Exporting SDK to /opt/neon ===="
+temp_dir=$(mktemp -d)
+
+cleanup() {
+  podman rm -f ${HOST_TAG}-container 2>/dev/null || true
+  podman rm -f ${TAG}-container 2>/dev/null || true
+  [ -d "${temp_dir}" ] && rm -rf "${temp_dir}" 2>/dev/null || true
+}
+
+trap cleanup EXIT INT TERM
+
 podman create --name ${HOST_TAG}-container ${HOST_TAG}:latest
-podman cp ${HOST_TAG}-container:/opt/neon /opt/neon
+podman cp ${HOST_TAG}-container:/opt/neon/ ${temp_dir}
 podman rm ${HOST_TAG}-container
 
 podman create --name ${TAG}-container ${TAG}:latest
-podman cp ${TAG}-container:/opt/neon /opt/neon
+podman cp ${TAG}-container:/opt/neon/ ${temp_dir}
 podman rm ${TAG}-container
+
+sudo rm -rf /opt/neon
+sudo mv ${temp_dir}/neon /opt/neon
+rm -rf ${temp_dir}
+
+echo "==== Done ===="

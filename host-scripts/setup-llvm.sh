@@ -21,6 +21,6 @@ cmake -G Ninja ../../llvm-project/llvm \
   -DLLVM_ENABLE_LLD=ON
 ninja -j"$(nproc)"
 
-sudo cmake --install . --prefix ${destination}
+cmake --install . --prefix ${destination}
 
 rm -rf llvm-project

@@ -22,7 +22,7 @@ COPY scripts/ /usr/local/bin/scripts/
 
 RUN chmod +x /usr/local/bin/scripts/*.sh \
   && /usr/local/bin/scripts/setup-base.sh \
+  && /usr/local/bin/scripts/get-llvm.sh \
   && /usr/local/bin/scripts/setup-sysroot.sh \
-  && /usr/local/bin/scripts/setup-llvm.sh \
   && /usr/local/bin/scripts/setup-scripts.sh \
   && /usr/local/bin/scripts/cleanup.sh

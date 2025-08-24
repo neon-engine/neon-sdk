@@ -12,7 +12,7 @@ wget -O- https://apt.llvm.org/llvm-snapshot.gpg.key | gpg --dearmor >/etc/apt/tr
 
 wget https://apt.llvm.org/llvm.sh
 chmod +x llvm.sh
-./llvm.sh ${LLVM_MAJOR}
+./llvm.sh ${LLVM_MAJOR} all
 
 mkdir -p ${SDK}/llvm-${LLVM_MAJOR}/bin
 for b in clang clang++ lld llvm-ar llvm-ranlib llvm-strip llvm-nm; do

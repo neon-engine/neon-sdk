@@ -13,7 +13,7 @@ ARG DEBIAN_RELEASE=bookworm
 ENV DEBIAN_RELEASE=${DEBIAN_RELEASE}
 
 ARG SDK_PATH=/opt/neon/sdk
-ENV SDK=${SDK_PATH}
+ENV SDK=${SDK_PATH}/${ARCH}
 ENV DEBIAN_FRONTEND=noninteractive
 
 SHELL ["/bin/bash","-euo","pipefail","-c"]

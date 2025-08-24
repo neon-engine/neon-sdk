@@ -7,7 +7,7 @@ set -euo pipefail
 : "${ARCH:?ARCH environment variable is not set}"
 : "${ARCH_ALT:?ARCH_ALT environment variable is not set}"
 
-SYSROOT=${SDK}/sysroots/${ARCH}-gnu-${DEBIAN_RELEASE}
+SYSROOT=${SDK}/sysroot/${ARCH}-gnu-${DEBIAN_RELEASE}
 mkdir -p "${SYSROOT}"
 
 cat << EOF > "multistrap.conf"

@@ -6,6 +6,9 @@ ENV ARCH_ALT=arm64
 ARG LLVM_MAJOR=20
 ENV LLVM_MAJOR=${LLVM_MAJOR}
 
+ARG VULKAN_SDK_VERSION=1.3.296
+ENV VULKAN_SDK_VERSION=${VULKAN_SDK_VERSION}
+
 ARG DEBIAN_RELEASE=bookworm
 ENV DEBIAN_RELEASE=${DEBIAN_RELEASE}
 
@@ -23,5 +26,6 @@ COPY target-scripts/ /usr/local/bin/scripts/
 
 RUN chmod +x /usr/local/bin/scripts/*.sh \
   && /usr/local/bin/scripts/setup-base.sh \
-  && /usr/local/bin/scripts/setup-sysroot.sh \
   && /usr/local/bin/scripts/cleanup.sh
+
+RUN /usr/local/bin/scripts/setup-sysroot.sh

@@ -11,10 +11,12 @@ destination=${SDK}/bin/llvm-${LLVM_MAJOR}
 
 git clone https://github.com/llvm/llvm-project.git --depth 1 -b release/${LLVM_MAJOR}.x
 
+old_dir=$(pwd)
+
 mkdir -p build/llvm && cd build/llvm
 cmake -G Ninja ../../llvm-project/llvm \
   -DCMAKE_BUILD_TYPE=Release \
-  -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra;lld;lldb;openmp" \
+  -DLLVM_ENABLE_PROJECTS="clang;lld;" \
   -DLLVM_ENABLE_RUNTIMES="compiler-rt;libcxx;libcxxabi;libunwind" \
   -DLLVM_TARGETS_TO_BUILD="X86;AArch64" \
   -DLLVM_TOOLCHAIN_TOOLS="llvm-ar;llvm-ranlib;llvm-objdump;llvm-rc;llvm-cvtres;llvm-nm;llvm-strings;llvm-readobj;llvm-dlltool;llvm-pdbutil;llvm-objcopy;llvm-strip;llvm-cov;llvm-profdata;llvm-addr2line;llvm-symbolizer;llvm-windres;llvm-ml;llvm-readelf;llvm-size;llvm-cxxfilt;llvm-lib" \
@@ -22,5 +24,7 @@ cmake -G Ninja ../../llvm-project/llvm \
 ninja -j"$(nproc)"
 
 cmake --install . --prefix ${destination}
+
+cd ${old_dir}
 
 rm -rf llvm-project

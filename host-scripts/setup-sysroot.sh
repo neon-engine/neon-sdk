@@ -2,21 +2,22 @@
 
 set -euo pipefail
 
-: "${SDK_ROOT:?SDK_ROOT environment variable is not set}"
+: "${SDK:?SDK environment variable is not set}"
 : "${DEBIAN_RELEASE:?DEBIAN_RELEASE environment variable is not set}"
+: "${ARCH:?ARCH environment variable is not set}"
 
-arch=$(uname -m)
+
 declare alt_arch
-if [[ "${arch}" == "x86_64" ]]; then
+if [[ "${ARCH}" == "x86_64" ]]; then
     alt_arch="amd64"
-elif [[ "${arch}" == "aarch64" ]]; then
+elif [[ "${ARCH}" == "aarch64" ]]; then
     alt_arch="arm64"
 else
-    echo "Error: Unsupported architecture '${arch}'" >&2
+    echo "Error: Unsupported architecture '${ARCH}'" >&2
     exit 1
 fi
 
-SYSROOT=${SDK_ROOT}/host/${arch}-gnu-${DEBIAN_RELEASE}
+
 mkdir -p "${SYSROOT}"
 
 cat << EOF > "multistrap.conf"

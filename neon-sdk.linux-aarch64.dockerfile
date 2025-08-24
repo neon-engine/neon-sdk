@@ -13,6 +13,7 @@ ARG SDK_ROOT=/opt/neon
 ENV SDK_ROOT=${SDK_ROOT}
 ARG SDK_PATH=${SDK_ROOT}/sdk
 ENV SDK=${SDK_PATH}/target/${ARCH}
+ENV SYSROOT=${SDK}/sysroot/${ARCH}-gnu-${DEBIAN_RELEASE}
 
 ENV DEBIAN_FRONTEND=noninteractive
 

@@ -48,7 +48,7 @@ while true; do
   esac
 done
 
-HOST_TAG="neon-sdk.linux-${target}-$(uname -m)"
+HOST_TAG="neon-sdk.linux-host-${host}"
 HOST_DOCKERFILE="neon-sdk.linux-host.dockerfile"
 
 TAG="neon-sdk.linux-${target}"
@@ -78,8 +78,10 @@ else
 fi
 
 echo "==== Building Neon SDK cross-compile host for: ${host} ===="
-${CONTAINER_ENGINE} ${CONTAINER_COMMAND} -t ${HOST_TAG} -f ${HOST_DOCKERFILE}
-
+${CONTAINER_ENGINE} ${CONTAINER_COMMAND} \
+  --build-arg ARCH=$(uname -m) \
+  -t ${HOST_TAG} \
+  -f ${HOST_DOCKERFILE}
 
 echo "==== Building Neon SDK cross-compile target for: ${host} ===="
 ${CONTAINER_ENGINE} ${CONTAINER_COMMAND} -t ${TAG} -f ${DOCKERFILE}

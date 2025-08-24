@@ -4,10 +4,9 @@ set -euo pipefail
 
 : "${SDK:?SDK environment variable is not set}"
 : "${DEBIAN_RELEASE:?DEBIAN_RELEASE environment variable is not set}"
-: "${ARCH:?ARCH environment variable is not set}"
 : "${ARCH_ALT:?ARCH_ALT environment variable is not set}"
+: "${SYSROOT:?SYSROOT environment variable is not set}"
 
-SYSROOT=${SDK}/target/${ARCH}-gnu-${DEBIAN_RELEASE}
 mkdir -p "${SYSROOT}"
 
 cat << EOF > "multistrap.conf"

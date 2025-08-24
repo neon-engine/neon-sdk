@@ -6,17 +6,21 @@ set -euo pipefail
 : "${DEBIAN_RELEASE:?DEBIAN_RELEASE environment variable is not set}"
 : "${LLVM_MAJOR:?LLVM_MAJOR environment variable is not set}"
 
-SYSROOT=${SDK}/host/$(uname -m)-gnu-${DEBIAN_RELEASE}
+destination=${SDK}/bin/llvm-${LLVM_MAJOR}
 
-echo "deb http://apt.llvm.org/${DEBIAN_RELEASE}/ llvm-toolchain-${DEBIAN_RELEASE}-${LLVM_MAJOR} main" > /etc/apt/sources.list.d/llvm.list
 
-wget -O- https://apt.llvm.org/llvm-snapshot.gpg.key | gpg --dearmor >/etc/apt/trusted.gpg.d/apt.llvm.org.gpg
+git clone https://github.com/llvm/llvm-project.git --depth 1 -b release/${LLVM_MAJOR}.x
 
-wget https://apt.llvm.org/llvm.sh
-chmod +x llvm.sh
-./llvm.sh ${LLVM_MAJOR} all
+mkdir -p build/llvm && cd build/llvm
+cmake -G Ninja ../../llvm-project/llvm \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DLLVM_ENABLE_PROJECTS="clang;clang-tools-extra;lld;lldb;openmp" \
+  -DLLVM_ENABLE_RUNTIMES="compiler-rt;libcxx;libcxxabi" \
+  -DLLVM_TARGETS_TO_BUILD="X86;AArch64" \
+  -DLLVM_TOOLCHAIN_TOOLS="llvm-ar;llvm-ranlib;llvm-objdump;llvm-rc;llvm-cvtres;llvm-nm;llvm-strings;llvm-readobj;llvm-dlltool;llvm-pdbutil;llvm-objcopy;llvm-strip;llvm-cov;llvm-profdata;llvm-addr2line;llvm-symbolizer;llvm-windres;llvm-ml;llvm-readelf;llvm-size;llvm-cxxfilt;llvm-lib" \
+  -DLLVM_ENABLE_LLD=ON
+ninja -j"$(nproc)"
 
-mkdir -p ${SYSROOT}/llvm-${LLVM_MAJOR}/bin
-for b in clang clang++ lld llvm-ar llvm-ranlib llvm-strip llvm-nm; do
-    ln -s /usr/bin/${b}-${LLVM_MAJOR} ${SYSROOT}/llvm-${LLVM_MAJOR}/bin/${b};
-done
+sudo cmake --install . --prefix ${destination}
+
+rm -rf llvm-project

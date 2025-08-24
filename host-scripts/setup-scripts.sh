@@ -20,7 +20,7 @@ for target_arch in "${architectures[@]}"; do
   # Create clang wrapper
   cat > ${SDK}/bin/${target_arch}-gnu-clang <<EOF
 #!/usr/bin/env bash
-exec ${SDK}/llvm-${LLVM_MAJOR}/bin/clang \\
+exec ${SDK}/bin/llvm-${LLVM_MAJOR}/bin/clang \\
   --target=${target_arch}-linux-gnu \\
   --sysroot=${target_sysroot} \\
   -fuse-ld=lld \\
@@ -32,7 +32,7 @@ echo "wrote ${SDK}/bin/${target_arch}-gnu-clang"
   # Create clang++ wrapper
   cat > ${SDK}/bin/${target_arch}-gnu-clang++ <<EOF
 #!/usr/bin/env bash
-exec ${SDK}/llvm-${LLVM_MAJOR}/bin/clang++ \\
+exec ${SDK}/bin/llvm-${LLVM_MAJOR}/bin/clang++ \\
   --target=${target_arch}-linux-gnu \\
   --sysroot=${target_sysroot} \\
   -stdlib=libstdc++ \\

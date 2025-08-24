@@ -21,4 +21,14 @@ apt-get install -y --no-install-recommends \
     wget \
     software-properties-common \
     gnupg \
-    multistrap
+    multistrap \
+    git \
+    ninja-build \
+    python3 \
+    build-essential \
+    zlib1g-dev \
+    libxml2-dev \
+    libedit-dev \
+    libncurses5-dev \
+    libffi-dev \
+    lld

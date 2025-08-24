@@ -30,7 +30,10 @@ packages=libc6 \
   zlib1g-dev \
   libvulkan-dev \
   vulkan-validationlayers \
-  linux-headers-generic
+  linux-headers-generic \
+  libxxf86vm-dev \
+  libxi-dev \
+  wayland-dev
 source=http://deb.debian.org/debian
 keyring=debian-archive-keyring
 suite=${DEBIAN_RELEASE}

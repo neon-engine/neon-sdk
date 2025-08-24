@@ -29,7 +29,7 @@ EOF
 
 chmod +x ${SDK}/bin/*
 
-cat > ${SDK}/toolchains/${ARCH}-gnu-clang-toolchain.cmake <<EOF
+cat > ${SDK}/clang-llvm-toolchain.cmake <<EOF
 set(CMAKE_SYSTEM_NAME Linux)
 set(CMAKE_SYSTEM_PROCESSOR ${ARCH})
 set(CMAKE_SYSROOT "${SDK}/sysroot/${ARCH}-gnu-bookworm")

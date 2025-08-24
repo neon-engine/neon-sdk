@@ -12,7 +12,7 @@ ENV DEBIAN_RELEASE=${DEBIAN_RELEASE}
 ARG SDK_ROOT=/opt/neon
 ENV SDK_ROOT=${SDK_ROOT}
 ARG SDK_PATH=${SDK_ROOT}/sdk
-ENV SDK=${SDK_PATH}/host/${ARCH}
+ENV SDK=${SDK_PATH}/host/linux-${ARCH}
 ENV SYSROOT=${SDK}/sysroot/${ARCH}-gnu-${DEBIAN_RELEASE}
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -25,4 +25,5 @@ RUN chmod +x /usr/local/bin/scripts/*.sh \
   && /usr/local/bin/scripts/setup-base.sh \
   && /usr/local/bin/scripts/setup-sysroot.sh \
   && /usr/local/bin/scripts/setup-llvm.sh \
+  && /usr/local/bin/scripts/setup-scripts.sh \
   && /usr/local/bin/scripts/cleanup.sh

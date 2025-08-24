@@ -3,39 +3,63 @@
 set -euo pipefail
 
 : "${SDK:?SDK environment variable is not set}"
+: "${SDK_PATH:?SDK_PATH environment variable is not set}"
 : "${LLVM_MAJOR:?LLVM_MAJOR environment variable is not set}"
 : "${ARCH:?ARCH environment variable is not set}"
 : "${DEBIAN_RELEASE:?DEBIAN_RELEASE environment variable is not set}"
 
-cat > ${SDK}/bin/${ARCH}-gnu-clang <<EOF
+# Create bin directory if it doesn't exist
+mkdir -p ${SDK}/bin
+
+# Define architectures to process
+architectures=("x86_64" "aarch64")
+
+for target_arch in "${architectures[@]}"; do
+  target_sysroot=${SDK_PATH}/target/linux-${target_arch}/sysroot/${target_arch}-gnu-${DEBIAN_RELEASE}
+  
+  # Create clang wrapper
+  cat > ${SDK}/bin/${target_arch}-gnu-clang <<EOF
 #!/usr/bin/env bash
-exec ${SDK}/llvm-${LLVM_MAJOR}/bin/clang \
-  --target=${ARCH}-linux-gnu \
-  --sysroot=${SDK}/target/${ARCH}-gnu-${DEBIAN_RELEASE} \
-  -fuse-ld=lld \
+exec ${SDK}/llvm-${LLVM_MAJOR}/bin/clang \\
+  --target=${target_arch}-linux-gnu \\
+  --sysroot=${target_sysroot} \\
+  -fuse-ld=lld \\
   "\$@"
 EOF
 
-cat > ${SDK}/bin/${ARCH}-gnu-clang++ <<EOF
+echo "wrote ${SDK}/bin/${target_arch}-gnu-clang"
+
+  # Create clang++ wrapper
+  cat > ${SDK}/bin/${target_arch}-gnu-clang++ <<EOF
 #!/usr/bin/env bash
-exec ${SDK}/llvm-${LLVM_MAJOR}/bin/clang++ \
-  --target=${ARCH}-linux-gnu \
-  --sysroot=${SDK}/target/${ARCH}-gnu-${DEBIAN_RELEASE} \
-  -stdlib=libstdc++ \
-  -fuse-ld=lld \
+exec ${SDK}/llvm-${LLVM_MAJOR}/bin/clang++ \\
+  --target=${target_arch}-linux-gnu \\
+  --sysroot=${target_sysroot} \\
+  -stdlib=libstdc++ \\
+  -fuse-ld=lld \\
   "\$@"
 EOF
 
+echo "wrote ${SDK}/bin/${target_arch}-gnu-clang++"
+
+done
+
+# Make all wrappers executable
 chmod +x ${SDK}/bin/*
 
-cat > ${SDK}/${ARCH}-gnu-toolchain.cmake <<EOF
+# Generate toolchain and environment files for each architecture
+for target_arch in "${architectures[@]}"; do
+  target_sysroot=${SDK_PATH}/target/linux-${target_arch}/sysroot/${target_arch}-gnu-${DEBIAN_RELEASE}
+  
+  # Create toolchain cmake file
+  cat > ${SDK}/${target_arch}-gnu-toolchain.cmake <<EOF
 set(CMAKE_SYSTEM_NAME Linux)
-set(CMAKE_SYSTEM_PROCESSOR ${ARCH})
-set(CMAKE_SYSROOT "${SDK}/target/${ARCH}-gnu-${DEBIAN_RELEASE}")
-set(CMAKE_C_COMPILER   "${SDK}/bin/${ARCH}-gnu-clang")
-set(CMAKE_CXX_COMPILER "${SDK}/bin/${ARCH}-gnu-clang++")
-set(CMAKE_C_COMPILER_TARGET   "${ARCH}-linux-gnu")
-set(CMAKE_CXX_COMPILER_TARGET "${ARCH}-linux-gnu")
+set(CMAKE_SYSTEM_PROCESSOR ${target_arch})
+set(CMAKE_SYSROOT "${target_sysroot}")
+set(CMAKE_C_COMPILER   "${SDK}/bin/${target_arch}-gnu-clang")
+set(CMAKE_CXX_COMPILER "${SDK}/bin/${target_arch}-gnu-clang++")
+set(CMAKE_C_COMPILER_TARGET   "${target_arch}-linux-gnu")
+set(CMAKE_CXX_COMPILER_TARGET "${target_arch}-linux-gnu")
 add_link_options(-fuse-ld=lld)
 
 # Build type settings
@@ -61,15 +85,15 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
 endif()
 EOF
 
-# Create environment.sh with separate DEBUG/RELEASE settings
-cat > ${SDK}/environment.sh <<EOF
-export CC=${SDK}/bin/${ARCH}-gnu-clang
-export CXX=${SDK}/bin/${ARCH}-gnu-clang++
+  # Create environment.sh with separate DEBUG/RELEASE settings
+  cat > ${SDK}/${target_arch}-environment.sh <<EOF
+export CC=${SDK}/bin/${target_arch}-gnu-clang
+export CXX=${SDK}/bin/${target_arch}-gnu-clang++
 export AR=${SDK}/llvm-${LLVM_MAJOR}/bin/llvm-ar
 export RANLIB=${SDK}/llvm-${LLVM_MAJOR}/bin/llvm-ranlib
 export STRIP=${SDK}/llvm-${LLVM_MAJOR}/bin/llvm-strip
-export PKG_CONFIG_SYSROOT_DIR=${SDK}/target/${ARCH}-gnu-${DEBIAN_RELEASE}
-export PKG_CONFIG_LIBDIR=${SDK}/target/${ARCH}-gnu-${DEBIAN_RELEASE}/usr/lib/${ARCH}-linux-gnu/pkgconfig:${SDK}/target/${ARCH}-gnu-${DEBIAN_RELEASE}/usr/lib/pkgconfig:${SDK}/target/${ARCH}-gnu-${DEBIAN_RELEASE}/usr/share/pkgconfig
+export PKG_CONFIG_SYSROOT_DIR=${target_sysroot}
+export PKG_CONFIG_LIBDIR=${target_sysroot}/usr/lib/${target_arch}-linux-gnu/pkgconfig:${target_sysroot}/usr/lib/pkgconfig:${target_sysroot}/usr/share/pkgconfig
 
 # Common flags for all build types
 export COMMON_FLAGS="-pipe"
@@ -90,17 +114,19 @@ export CFLAGS="\${RELEASE_CFLAGS}"
 export CXXFLAGS="\${RELEASE_CXXFLAGS}"
 EOF
 
-# Create separate files for debug and release environments
-cat > ${SDK}/environment-debug.sh <<EOF
-source ${SDK}/environment.sh
+  # Create separate files for debug and release environments
+  cat > ${SDK}/${target_arch}-environment-debug.sh <<EOF
+source ${SDK}/${target_arch}-environment.sh
 export CFLAGS="\${DEBUG_CFLAGS}"
 export CXXFLAGS="\${DEBUG_CXXFLAGS}"
 EOF
 
-cat > ${SDK}/environment-release.sh <<EOF
-source ${SDK}/environment.sh
+  cat > ${SDK}/${target_arch}-environment-release.sh <<EOF
+source ${SDK}/${target_arch}-environment.sh
 export CFLAGS="\${RELEASE_CFLAGS}"
 export CXXFLAGS="\${RELEASE_CXXFLAGS}"
 EOF
+done
 
-chmod +x ${SDK}/environment*.sh
+# Make all environment scripts executable
+chmod +x ${SDK}/*-environment*.sh
